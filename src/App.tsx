@@ -9,6 +9,7 @@ import { filterCountries } from "./utils";
 import ErrorMessage from "./components/error-message";
 import Conditional from "./components/conditional";
 import Detail from "./views/detail";
+import { Fetching } from "./components/fetching";
 
 const App = () => {
   const [fetching, setFetching] = useState(true);
@@ -53,27 +54,28 @@ const App = () => {
       });
   }, []);
 
-  if (fetching) {
-    return <div>Fetching Countries</div>;
-  }
-
   return (
     <Layout>
       <Layout.Header>
         <Header search={search} onChangeSearch={setSearch} />
       </Layout.Header>
       <Layout.Body>
-        <ErrorMessage error={error} />
-        <List
-          countries={filteredCountries}
-          onSelect={(country) => setSelectedCountry(country)}
-        />
-        <Conditional condition={typeof selectedCountry !== "undefined"}>
-          <Detail
-            borderCountries={borderCountries}
-            country={selectedCountry as Country}
-            onClickBack={() => setSelectedCountry(undefined)}
+        <Conditional condition={fetching}>
+          <Fetching>Fetching Countries ...</Fetching>
+        </Conditional>
+        <Conditional condition={!fetching}>
+          <ErrorMessage error={error} />
+          <List
+            countries={filteredCountries}
+            onSelect={(country) => setSelectedCountry(country)}
           />
+          <Conditional condition={typeof selectedCountry !== "undefined"}>
+            <Detail
+              borderCountries={borderCountries}
+              country={selectedCountry as Country}
+              onClickBack={() => setSelectedCountry(undefined)}
+            />
+          </Conditional>
         </Conditional>
       </Layout.Body>
     </Layout>
